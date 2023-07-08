@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <!--meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" /-->
+  <!--meta http-equiv="Pragma" content="no-cache" /-->
+  <!--meta http-equiv="Expires" content="-1"/-->
+  <link rel="apple-touch-icon" sizes="180x180" href="style/favicon_img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="style/favicon_img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="style/favicon_img/favicon-16x16.png">
+  <link rel="manifest" href="style/favicon_img/site.webmanifest">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+  <link rel="stylesheet" type="text/css" href="style/main.css">
+  <script src="https://code.highcharts.com/stock/highstock.js"></script>
+  <script src="https://code.highcharts.com/stock/modules/data.js"></script>
+  <script src="https://code.highcharts.com/stock/modules/drag-panes.js"></script>
+  <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+  <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+  <script src="style/jquery-3.7.0.min.js"></script>
+  <script src="style/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.min.js" integrity="sha384-7VPbUDkoPSGFnVtYi0QogXtr74QeVeeIs99Qfg5YCF+TidwNdjvaKZX19NZ/e6oz" crossorigin="anonymous"></script>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-46EDYEMX0K"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-46EDYEMX0K');
+  </script>
+ </head>
+ <body class="bg-light">
+<header>
+  <div class="collapse bg-dark" id="navbarHeader">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-8 col-md-7 py-4">
+          <h4 class="text-white">About me</h4>
+          <p class="text-muted">I'm an ordinary software engineer. <br>
+          A web was built to chip analysis of three major legal entities in Taiwan's stock market. <br>
+          </p>
+        </div>
+        <div class="col-sm-4 offset-md-1 py-4">
+          <h4 class="text-white">Contact</h4>
+          <ul class="list-unstyled">
+            <li><a href="#" class="text-white">Email: luke360351@gmail.com</a></li>
+            <li><a href="https://github.com/luketseng/taifex_daily" class="text-white" target="_blank">GitHub</a></li>
+            <li><a href="#" class="text-white">Like on YouTube</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="logo_header" class="navbar navbar-dark bg-dark shadow-sm">
+    <div class="container">
+      <a href="http://zane.myftp.org/~luke/taifex_web/" class="navbar-brand d-flex align-items-center">
+        <!--svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" aria-hidden="true" class="me-2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg-->
+        <img id="logo" src="style/favicon_img/favicon-32x32.png">
+        <strong id="title">Dashboard</strong>
+      </a>
+      <nav class="nav nav-masthead justify-content-center float-md-end navbar-right">
+        <a class="nav-link fw-bold py-1 px-0 navbar-toggler active" target="_blank" href="https://www.youtube.com/@zanevive/playlists">Music</a>
+        <!--a class="nav-link fw-bold py-1 px-0 navbar-toggler active" aria-current="page" href="http://zanespace.ddns.net:8088/">Home</a-->
+        <a class="nav-link fw-bold py-1 px-0 navbar-toggler" href="#">TBD</a>
+        <!--p class="nav-link fw-bold py-1 px-0" href="#">Contact</p-->
+        <a class="nav-link fw-bold py-1 px-0 navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false">Contact</a>
+        <!--button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button-->
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <figure class="highcharts-figure">
+   <div id="container_stock" style=""></div>
+   <div id="container_MTX" style=""></div>
+   <!--object width="900" height="400" data="II_MTX.txt">
+   </object-->
+  </figure>
+
+</main>
+
+<footer class="text-muted py-4 text-white bg-dark">
+  <div class="container">
+    <p class="float-end mb-1">
+      <a href="#logo_header" id="toTopBtn" class="cd-top" data-abc="true"></a>
+      <!--a href="#">Back to top</a-->
+    </p>
+    <p class="mb-1">Hope you can find your own trading strategy here.</p>
+    <p class="mb-0">Good luck!</p>
+  </div>
+</footer>
+
+ </body>
+</html>
