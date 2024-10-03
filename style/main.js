@@ -164,42 +164,116 @@ var chart1_options = {
     }]
 };
 
+document.addEventListener('DOMContentLoaded', function() {
+    // Define the URLs of your JSON files
+    var filePaths = [
+        'FUT_TX.json',
+        'data.json'
+    ];
 
-Highcharts.getJSON(domain_url+'~luke/taifex_web/FUT_TX.json', function (data) {
+    // Function to fetch and process JSON data
+    function fetchDataAndProcess(filePath) {
+        return fetch(filePath)
+            .then(response => response.json())
+            .then(data => {
+                if (filePath.endsWith('FUT_TX.json')) {
+                    var dataLength = data.length,
+                        i = 0;
 
-    // split the data set into ohlc and volume
-    var ohlc = [],
-        volume = [],
-        dataLength = data.length,
-        i = 0;
+                    for (i; i < dataLength; i += 1) {
+                        chart1_options.series[0].data.push([
+                            data[i][0], // the date
+                            data[i][1], // open
+                            data[i][2], // high
+                            data[i][3], // low
+                            data[i][4] // close
+                        ]);
+                    }
+                }
+               // Depending on the source of data, process accordingly
+                else if (filePath.endsWith('data.json')) {
+                    var dataLength = data.length,
+                        i = 0;
 
-    for (i; i < dataLength; i += 1) {
-        chart1_options.series[0].data.push([
-            data[i][0], // the date
-            data[i][1], // open
-            data[i][2], // high
-            data[i][3], // low
-            data[i][4] // close
-        ]);
+                    for (i; i < dataLength; i += 1) {
+                        chart1_options.series[1].data.push([data[i][0], parseFloat(data[i][1])]);
+                        chart1_options.series[2].data.push([data[i][0], parseFloat(data[i][2])]);
+                        chart1_options.series[3].data.push([data[i][0], parseFloat(data[i][3])]);
+                        chart1_options.series[4].data.push([data[i][0], parseFloat(data[i][4])]);
+                    }
+                } else {
+                    console.log("unknow file read")
+                }
+            });
     }
+
+    // Iterate through each JSON URL and process the data
+    Promise.all(filePaths.map(filePath => fetchDataAndProcess(filePath)))
+        .then(() => {
+            // After processing all JSON data, create the chart
+            document.getElementById('container_stock').setAttribute("style","min-width: 330px; height: 990px; margin: 0 2.6rem;");
+            Highcharts.stockChart('container_stock', chart1_options);
+        });
 });
 
-Highcharts.getJSON(domain_url+'~luke/taifex_web/data.json', function (data) {
+//document.addEventListener('DOMContentLoaded', function() {
+//    fetch('../FUT_TX.json')
+//        .then(response => response.json())
+//        .then(data => {
+//            var ohlc = [],
+//                volume = [],
+//                dataLength = data.length,
+//                i = 0;
+//
+//            for (i; i < dataLength; i += 1) {
+//                chart1_options.series[0].data.push([
+//                    data[i][0], // the date
+//                    data[i][1], // open
+//                    data[i][2], // high
+//                    data[i][3], // low
+//                    data[i][4] // close
+//                ]);
+//            }
+//            document.getElementById('container_stock').setAttribute("style","min-width: 330px; height: 990px; margin: 0 2.6rem;");
+//            Highcharts.stockChart('container_stock', chart1_options);
+//        });
+//});
 
-    i = 0;
-    dataLength = data.length;
-    for (i; i < dataLength; i += 1) {
-        chart1_options.series[1].data.push([data[i][0], parseFloat(data[i][1])]);
-        chart1_options.series[2].data.push([data[i][0], parseFloat(data[i][2])]);
-        chart1_options.series[3].data.push([data[i][0], parseFloat(data[i][3])]);
-        chart1_options.series[4].data.push([data[i][0], parseFloat(data[i][4])]);
-    }
-    //console.log(options.series)
+// Highcharts.getJSON(domain_url+'~luke/taifex_web/FUT_TX.json', function (data) {
+//
+//     // split the data set into ohlc and volume
+//     var ohlc = [],
+//         volume = [],
+//         dataLength = data.length,
+//         i = 0;
+//
+//     for (i; i < dataLength; i += 1) {
+//         chart1_options.series[0].data.push([
+//             data[i][0], // the date
+//             data[i][1], // open
+//             data[i][2], // high
+//             data[i][3], // low
+//             data[i][4] // close
+//         ]);
+//     }
+// });
 
-    // create the chart
-    document.getElementById('container_stock').setAttribute("style","min-width: 330px; height: 990px; margin: 0 2.6rem;");
-    Highcharts.stockChart('container_stock', chart1_options);
-});
+//Highcharts.getJSON(domain_url+'~luke/taifex_web/data.json', function (data) {
+//
+//    i = 0;
+//    dataLength = data.length;
+//    for (i; i < dataLength; i += 1) {
+//        chart1_options.series[1].data.push([data[i][0], parseFloat(data[i][1])]);
+//        chart1_options.series[2].data.push([data[i][0], parseFloat(data[i][2])]);
+//        chart1_options.series[3].data.push([data[i][0], parseFloat(data[i][3])]);
+//        chart1_options.series[4].data.push([data[i][0], parseFloat(data[i][4])]);
+//    }
+//    //console.log(options.series)
+//
+//    // create the chart
+//    document.getElementById('container_stock').setAttribute("style","min-width: 330px; height: 990px; margin: 0 2.6rem;");
+//    Highcharts.stockChart('container_stock', chart1_options);
+//});
 
 var chart2_options = {
     plotOptions: {
@@ -293,21 +367,39 @@ var chart2_options = {
         data: [],
     }]
 };
-Highcharts.getJSON(domain_url+'~luke/taifex_web/data_MTX.json', function (data) {
-    //console.log(data)
 
-    i = 0;
-    dataLength = data.length;
-    for (i; i < dataLength; i += 1) {
-        chart2_options.series[0].data.push([data[i][0], parseFloat(data[i][1])]);
-        chart2_options.series[1].data.push([data[i][0], parseFloat(data[i][2])]);
-        chart2_options.series[2].data.push([data[i][0], parseFloat(data[i][3])]);
-        chart2_options.series[3].data.push([data[i][0], parseFloat(data[i][4])]);
-        //chart2_options.series[4].data.push([data[i][0], parseFloat(data[i][5])]);
-    }
-    //console.log(options.series)
-
-    // create the chart
-    document.getElementById('container_MTX').setAttribute("style","min-width: 330px; height: 660px; margin: 0 2.6rem; padding: 1rem 0;");
-    Highcharts.stockChart('container_MTX', chart2_options);
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('data_MTX.json')
+        .then(response => response.json())
+        .then(data => {
+           i = 0;
+           dataLength = data.length;
+           for (i; i < dataLength; i += 1) {
+               chart2_options.series[0].data.push([data[i][0], parseFloat(data[i][1])]);
+               chart2_options.series[1].data.push([data[i][0], parseFloat(data[i][2])]);
+               chart2_options.series[2].data.push([data[i][0], parseFloat(data[i][3])]);
+               chart2_options.series[3].data.push([data[i][0], parseFloat(data[i][4])]);
+           }
+           // create the chart
+           document.getElementById('container_MTX').setAttribute("style","min-width: 330px; height: 660px; margin: 0 2.6rem; padding: 1rem 0;");
+           Highcharts.stockChart('container_MTX', chart2_options);
+        });
 });
+//Highcharts.getJSON(domain_url+'~luke/taifex_web/data_MTX.json', function (data) {
+//    //console.log(data)
+//
+//    i = 0;
+//    dataLength = data.length;
+//    for (i; i < dataLength; i += 1) {
+//        chart2_options.series[0].data.push([data[i][0], parseFloat(data[i][1])]);
+//        chart2_options.series[1].data.push([data[i][0], parseFloat(data[i][2])]);
+//        chart2_options.series[2].data.push([data[i][0], parseFloat(data[i][3])]);
+//        chart2_options.series[3].data.push([data[i][0], parseFloat(data[i][4])]);
+//        //chart2_options.series[4].data.push([data[i][0], parseFloat(data[i][5])]);
+//    }
+//    //console.log(options.series)
+//
+//    // create the chart
+//    document.getElementById('container_MTX').setAttribute("style","min-width: 330px; height: 660px; margin: 0 2.6rem; padding: 1rem 0;");
+//    Highcharts.stockChart('container_MTX', chart2_options);
+//});

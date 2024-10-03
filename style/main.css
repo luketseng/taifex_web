@@ -43,3 +43,8 @@
   color: #fff;
   border-bottom-color: #fff;
 }
+
+#qrcode_jkos {
+  width: 50%;
+  height: auto;
+}
