@@ -1,0 +1,24 @@
+# Base image
+FROM mrcolorrain/vnc-browser:debian
+
+# Set environment variables
+ARG VNC_PASSWORD
+ENV VNC_PASSWORD=${VNC_PASSWORD}
+
+# Install essential tools
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        openssh-client \
+        curl \
+        wget && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install system dependencies and Python packages
+# RUN apt-get update && \
+#     apt-get install -y python3-pip && \
+#     pip3 install --no-cache-dir \
+#         numpy \
+#         PyDrive && \
+#         selenium \
+#     apt-get clean && rm -rf /var/lib/apt/lists/*

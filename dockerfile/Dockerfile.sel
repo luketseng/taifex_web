@@ -1,0 +1,16 @@
+# Use the official Selenium Chrome image as the base
+FROM selenium/standalone-chrome
+
+# Switch to root to install required packages
+USER root
+
+# Update package list and install Python 3 and pip
+RUN apt-get update && \
+    apt-get install -y python3 python3-pip && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install necessary Python packages
+RUN pip3 install --no-cache-dir numpy PyDrive requests
+
+# Switch back to default user
+USER seluser

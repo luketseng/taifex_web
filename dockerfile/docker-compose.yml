@@ -1,0 +1,40 @@
+---
+services:
+  taifex-vnc:
+    # image: mrcolorrain/vnc-browser:debian
+    build:
+      context: .
+      dockerfile: Dockerfile.vnc  # point to Dockerfile
+    container_name: taifex-vnc
+    ports:
+      - "5900:5900"        # VNC Viewer
+      - "6080:6080"          # Web access: http://host:6080
+    volumes:
+      - ~/git/taifex_daily:/git/taifex_daily
+    environment:
+      - VNC_PASSWORD=p@ssw0rd
+    #   - USER=zane
+    #   - HTTP_PASSWORD=p@ssw0rd
+    restart: unless-stopped
+    shm_size: 2g
+
+#  taifex-daily:
+#    container_name: taifex-daily
+#    build:
+#      context: .
+#      dockerfile: Dockerfile  # Use the specified Dockerfile for building the image
+#    volumes:
+#      - ./taifex_daily:/home/root/git/taifex_daily  # Mount local taifex_daily directory into container
+
+  taifex-web:
+    image: httpd:latest
+    container_name: taifex-web
+    ports:
+      - "8080:80"  # Serve web files on http://host:8080
+    volumes:
+      - ~/git/taifex_web:/usr/local/apache2/htdocs/
+
+# docker compose down
+# docker compose build  # create custom image
+# docker builder prune  # clear build data
+# docker compose up -d  # enable service
