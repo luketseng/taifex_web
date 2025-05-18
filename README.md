@@ -1,7 +1,12 @@
-# TAIFEX Web
+# TAIFEX WEB
 
 This project provides a web frontend for chip analysis of the three major institutional investors in Taiwan's stock market.  
 It integrates with other TAIFEX projects for data backup, automation, and infrastructure, offering a complete solution for data visualization and interactive queries.
+
+## 🌐 Web Application
+
+- The data backed up by this project is visualized and accessible via the TAIFEX Web frontend:  
+  [http://zane.myftp.org/](http://zane.myftp.org/)
 
 ## 📝 Project Description
 
