@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
     Promise.all(filePaths.map(filePath => fetchDataAndProcess(filePath)))
         .then(() => {
             // After processing all JSON data, create the chart
-            document.getElementById('container_stock').setAttribute("style","min-width: 330px; height: 990px; margin: 0 2.6rem;");
+            document.getElementById('container_stock').setAttribute("style","min-width: 330px; height: 990px; margin: 0 2.6rem 1rem;");
             Highcharts.stockChart('container_stock', chart1_options);
         });
 });
@@ -381,7 +381,7 @@ document.addEventListener('DOMContentLoaded', function() {
                chart2_options.series[3].data.push([data[i][0], parseFloat(data[i][4])]);
            }
            // create the chart
-           document.getElementById('container_MTX').setAttribute("style","min-width: 330px; height: 660px; margin: 0 2.6rem; padding: 1rem 0;");
+           document.getElementById('container_MTX').setAttribute("style","min-width: 330px; height: 660px; margin: 0 2.6rem;");
            Highcharts.stockChart('container_MTX', chart2_options);
         });
 });

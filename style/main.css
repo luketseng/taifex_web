@@ -1,9 +1,31 @@
-<style type="text/css">
-#container_stock {
-   padding: 25px 50px;
+html,
+body {
+  min-height: 100%;
 }
+
+body.site-bg {
+  background: #2a2a2b;
+}
+
+main {
+  background: #2a2a2b;
+}
+
+.highcharts-figure {
+  background: linear-gradient(135deg, #2a2a2b 0%, #3e3e40 100%);
+  margin: 0;
+  padding: 1rem 0;
+}
+
+#container_stock,
 #container_MTX {
-   padding: 25px 50px;
+  padding: 16px 0;
+  background: #2a2a2b;
+  border: 1px solid rgba(224, 224, 227, .16);
+  border-radius: 6px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .18);
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 #logo {
