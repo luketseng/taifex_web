@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-TW">
  <head>
-  <!--meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" /-->
-  <!--meta http-equiv="Pragma" content="no-cache" /-->
-  <!--meta http-equiv="Expires" content="-1"/-->
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TAIFEX 籌碼儀表板 | 台指期與三大法人多空動向</title>
+  
   <!-- iOS (Apple Touch Icon) -->
   <link rel="apple-touch-icon" sizes="180x180" href="style/favicon_img/apple-touch-icon.png">
   <!-- Android (Chrome) -->
@@ -16,8 +16,12 @@
   <link rel="shortcut icon" href="style/favicon_img/favicon.ico">
   <!-- Web App Manifest -->
   <link rel="manifest" href="style/favicon_img/site.webmanifest">
+  
+  <!-- Stylesheets -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
   <link rel="stylesheet" type="text/css" href="style/main.css">
+  
+  <!-- Highcharts & Modules -->
   <script src="https://code.highcharts.com/stock/highstock.js"></script>
   <script src="https://code.highcharts.com/stock/modules/data.js"></script>
   <script src="https://code.highcharts.com/stock/modules/drag-panes.js"></script>
@@ -28,99 +32,241 @@
   <script src="style/main.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.min.js" integrity="sha384-7VPbUDkoPSGFnVtYi0QogXtr74QeVeeIs99Qfg5YCF+TidwNdjvaKZX19NZ/e6oz" crossorigin="anonymous"></script>
+
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-46EDYEMX0K"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-46EDYEMX0K');
   </script>
  </head>
- <body class="site-bg">
-<header>
-  <div class="collapse bg-dark" id="navbarHeader">
-    <div class="container">
-      <div class="row">
-        <div class="col-sm-8 col-md-7 py-4">
-          <h4 class="text-white">About me</h4>
-          <p class="text-muted">I'm an ordinary software engineer. <br>
-          A web was built to chip analysis of three major legal entities in Taiwan's stock market. <br>
-          </p>
-        </div>
-        <div class="col-sm-4 offset-md-1 py-4">
-          <h4 class="text-white">Contact</h4>
-          <ul class="list-unstyled">
-            <li><a href="#" class="text-white">Email: luke360351@gmail.com</a></li>
-            <li><a href="https://github.com/luketseng/taifex_daily" class="text-white" target="_blank">GitHub</a></li>
-            <li><a href="#" class="text-white">Like on YouTube</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="collapse bg-dark" id="navbarHeader_donate">
-    <div class="container">
-      <div class="row">
-        <div class="col-sm-8 col-md-7 py-4">
-          <h4 class="text-white">Donate</h4>
-          <p class="text-muted">If you enjoy this website, you can show your support with the price of a cup of coffee.  <br>
-          Every contribution from different corners of the world will be my motivation to keep going. <br>
-          </p>
-        </div>
-        <div class="col-sm-4 offset-md-1 py-1">
-          <h4 class="text-white">jkos</h4>
-          <ul class="list-unstyled">
-            <img id="qrcode_jkos" src="style/img/joks.png">
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div id="logo_header" class="navbar navbar-dark bg-dark shadow-sm">
-    <div class="container">
-      <a href="http://zane.myftp.org/" class="navbar-brand d-flex align-items-center">
-        <!--svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" aria-hidden="true" class="me-2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg-->
-        <img id="logo" src="style/favicon_img/favicon-32x32.png">
-        <strong id="title">Dashboard</strong>
-      </a>
-      <nav class="nav nav-masthead justify-content-center float-md-end navbar-right">
-        <a class="nav-link fw-bold py-1 px-0 navbar-toggler active" target="_blank" href="https://www.youtube.com/@zanevive/playlists">Music</a>
-        <!--a class="nav-link fw-bold py-1 px-0 navbar-toggler active" aria-current="page" href="http://zanespace.ddns.net:8088/">Home</a-->
-        <!--a class="nav-link fw-bold py-1 px-0 navbar-toggler" href="#">TBD</a-->
-        <a class="nav-link fw-bold py-1 px-0 navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarHeader_donate" aria-controls="navbarHeader" aria-expanded="false">Donate</a>
-        <!--p class="nav-link fw-bold py-1 px-0" href="#">Contact</p-->
-        <a class="nav-link fw-bold py-1 px-0 navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false">Contact</a>
-        <!--button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
+ <body>
+
+  <!-- Navigation Bar -->
+  <header>
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+      <div class="container-fluid px-lg-4 px-3">
+        <a class="navbar-brand d-flex align-items-center" href="./">
+          <img id="logo" src="style/favicon_img/favicon-32x32.png" alt="Logo" width="28" height="28" class="me-2">
+          <strong class="fs-5 text-white">TAIFEX Web</strong>
+          <span class="brand-badge d-none d-sm-inline-block">籌碼分析</span>
+          <span id="latest_date_badge" class="badge bg-dark border border-secondary text-light ms-2 font-monospace" style="font-size: 0.75rem;">資料載入中...</span>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-controls="navMenu" aria-expanded="false" aria-label="切換導航選單">
           <span class="navbar-toggler-icon"></span>
-        </button-->
-      </nav>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navMenu">
+          <div class="navbar-nav align-items-lg-center gap-lg-1 mt-2 mt-lg-0">
+            <a class="nav-link-custom" href="https://www.youtube.com/@zanevive/playlists" target="_blank" rel="noopener">音樂清單</a>
+            <a class="nav-link-custom" href="#" data-bs-toggle="modal" data-bs-target="#modalDonate">贊助支持</a>
+            <a class="nav-link-custom" href="#" data-bs-toggle="modal" data-bs-target="#modalAbout">關於本站</a>
+            <a class="nav-link-custom" href="https://github.com/luketseng/taifex_daily" target="_blank" rel="noopener">GitHub</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main class="dashboard-container">
+    <div class="container-fluid px-lg-4 px-3">
+
+      <!-- Error State Banner -->
+      <div id="error_banner" class="error-banner">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <strong>載入提醒：</strong>
+            <span id="error_msg">無法載入最新行情數據，請確認資料檔案狀態。</span>
+          </div>
+          <button class="btn btn-sm btn-outline-danger" onclick="location.reload()">重新整理</button>
+        </div>
+      </div>
+
+      <!-- KPI Summary Cards Grid -->
+      <section class="kpi-grid">
+        <!-- KPI Card 1: TX Close -->
+        <div class="kpi-card">
+          <div class="kpi-title">
+            <span>台指期貨收盤 (TX)</span>
+            <span class="badge-tag bg-primary bg-opacity-25 text-primary">期貨</span>
+          </div>
+          <div id="kpi_tx_price" class="kpi-value">
+            <div class="skeleton-box" style="height: 28px; width: 60%;"></div>
+          </div>
+          <div id="kpi_tx_change" class="kpi-sub val-neutral">
+            <div class="skeleton-box mt-1" style="height: 16px; width: 45%;"></div>
+          </div>
+        </div>
+
+        <!-- KPI Card 2: Foreign TX Lots -->
+        <div class="kpi-card">
+          <div class="kpi-title">
+            <span>外資期貨淨未平倉</span>
+            <span class="badge-tag bg-info bg-opacity-25 text-info">主力多空</span>
+          </div>
+          <div id="kpi_foreign_lots" class="kpi-value">
+            <div class="skeleton-box" style="height: 28px; width: 65%;"></div>
+          </div>
+          <div id="kpi_foreign_lots_change" class="kpi-sub val-neutral">
+            <div class="skeleton-box mt-1" style="height: 16px; width: 50%;"></div>
+          </div>
+        </div>
+
+        <!-- KPI Card 3: Foreign Spot Net Amount -->
+        <div class="kpi-card">
+          <div class="kpi-title">
+            <span>外資現貨買賣超</span>
+            <span class="badge-tag bg-warning bg-opacity-25 text-warning">大盤現貨</span>
+          </div>
+          <div id="kpi_spot_amount" class="kpi-value">
+            <div class="skeleton-box" style="height: 28px; width: 55%;"></div>
+          </div>
+          <div id="kpi_spot_sub" class="kpi-sub val-neutral">
+            <div class="skeleton-box mt-1" style="height: 16px; width: 40%;"></div>
+          </div>
+        </div>
+
+        <!-- KPI Card 4: MTX Major Entities Net -->
+        <div class="kpi-card">
+          <div class="kpi-title">
+            <span>小台三大法人合計</span>
+            <span class="badge-tag bg-success bg-opacity-25 text-success">小台指</span>
+          </div>
+          <div id="kpi_mtx_total" class="kpi-value">
+            <div class="skeleton-box" style="height: 28px; width: 60%;"></div>
+          </div>
+          <div id="kpi_mtx_detail" class="kpi-sub val-neutral">
+            <div class="skeleton-box mt-1" style="height: 16px; width: 70%;"></div>
+          </div>
+        </div>
+
+        <!-- KPI Card 5: TX Volume -->
+        <div class="kpi-card">
+          <div class="kpi-title">
+            <span>大台當日成交量</span>
+            <span class="badge-tag bg-secondary bg-opacity-25 text-secondary">流動性</span>
+          </div>
+          <div id="kpi_tx_vol" class="kpi-value">
+            <div class="skeleton-box" style="height: 28px; width: 50%;"></div>
+          </div>
+          <div class="kpi-sub text-muted">台指日盤成交總口數</div>
+        </div>
+      </section>
+
+      <!-- Chart 1: Foreign Orientation & TX Spot -->
+      <section class="chart-card">
+        <div class="chart-card-header">
+          <div class="chart-title-area">
+            <h5>外資期貨籌碼與大盤走勢對照 (Foreign Orientation)</h5>
+            <p>台指期日 K 線 / 台指期、現貨、選擇權留倉金額 / 外資期貨淨留倉口數</p>
+          </div>
+          <div id="stock_range_btns" class="chart-controls">
+            <button class="range-btn" data-months="1">1月</button>
+            <button class="range-btn" data-months="3">3月</button>
+            <button class="range-btn active" data-months="6">6月</button>
+            <button class="range-btn" data-months="12">1年</button>
+            <button class="range-btn" data-months="0">全部</button>
+          </div>
+        </div>
+        <div class="chart-card-body">
+          <div id="stock_skeleton" class="skeleton-chart">
+            <div class="skeleton-spinner"></div>
+            <span class="text-muted small">正在加載外資籌碼與價格走勢圖...</span>
+          </div>
+          <div id="container_stock"></div>
+        </div>
+      </section>
+
+      <!-- Chart 2: MTX Orientation -->
+      <section class="chart-card">
+        <div class="chart-card-header">
+          <div class="chart-title-area">
+            <h5>小台三大法人動向 (MTX Orientation)</h5>
+            <p>自營商、投信、外資小台留倉口數及 5 日移動平均線</p>
+          </div>
+          <div id="mtx_range_btns" class="chart-controls">
+            <button class="range-btn" data-months="1">1月</button>
+            <button class="range-btn" data-months="3">3月</button>
+            <button class="range-btn active" data-months="6">6月</button>
+            <button class="range-btn" data-months="12">1年</button>
+            <button class="range-btn" data-months="0">全部</button>
+          </div>
+        </div>
+        <div class="chart-card-body">
+          <div id="mtx_skeleton" class="skeleton-chart">
+            <div class="skeleton-spinner"></div>
+            <span class="text-muted small">正在加載小台三大法人分項數據...</span>
+          </div>
+          <div id="container_MTX"></div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer-custom">
+    <div class="container-fluid px-lg-4 px-3 d-flex flex-wrap justify-content-between align-items-center">
+      <div>
+        <p class="mb-1 text-light fw-semibold">TAIFEX Web 籌碼觀測站</p>
+        <p class="mb-0 text-muted small">每日盤後自動化爬取台期所三大法人留倉數據，輔助交易策略研究。Good luck with your trading!</p>
+      </div>
+      <div class="mt-3 mt-sm-0">
+        <a href="#" id="toTopBtn" title="返回頂部" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modal: About -->
+  <div class="modal fade" id="modalAbout" tabindex="-1" aria-labelledby="modalAboutLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-dark text-light border-secondary">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title" id="modalAboutLabel">關於本站 (About)</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-secondary">
+          <p class="text-light">這是一個由軟體工程師打造的台灣期貨交易所（TAIFEX）籌碼可視化分析站點。</p>
+          <ul class="list-unstyled small">
+            <li class="mb-2"><strong>聯絡信箱：</strong> <a href="mailto:luke360351@gmail.com" class="text-info text-decoration-none">luke360351@gmail.com</a></li>
+            <li class="mb-2"><strong>開源專案：</strong> <a href="https://github.com/luketseng/taifex_daily" class="text-info text-decoration-none" target="_blank" rel="noopener">taifex_daily (後端資料管線)</a></li>
+            <li class="mb-2"><strong>部署架構：</strong> Docker + Highstock + SQLite3 自動化排程更新</li>
+          </ul>
+        </div>
+        <div class="modal-footer border-secondary">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">關閉</button>
+        </div>
+      </div>
     </div>
   </div>
-</header>
 
-<main>
-
-  <figure class="highcharts-figure">
-   <div id="container_stock" style=""></div>
-   <div id="container_MTX" style=""></div>
-   <!--object width="900" height="400" data="II_MTX.txt">
-   </object-->
-  </figure>
-
-</main>
-
-<footer class="text-muted py-4 text-white bg-dark">
-  <div class="container">
-    <p class="float-end mb-1">
-      <a href="#logo_header" id="toTopBtn" class="cd-top" data-abc="true"></a>
-      <!--a href="#">Back to top</a-->
-    </p>
-    <p class="mb-1">Hope you can find your own trading strategy here.</p>
-    <p class="mb-0">Good luck!</p>
+  <!-- Modal: Donate -->
+  <div class="modal fade" id="modalDonate" tabindex="-1" aria-labelledby="modalDonateLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-dark text-light border-secondary">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title" id="modalDonateLabel">贊助支持 (Donate)</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center text-secondary">
+          <p class="text-light mb-3">如果您覺得這個籌碼分析工具對您的交易有所啟發，歡迎請作者喝一杯咖啡！您的支持是持續維護本站的最大動力。</p>
+          <div class="p-3 bg-secondary bg-opacity-25 rounded d-inline-block">
+            <img id="qrcode_jkos" src="style/img/joks.png" alt="JKOPAY QR Code" style="max-width: 220px; height: auto;" class="rounded">
+            <div class="mt-2 small text-light fw-bold">街口支付 (JKOPAY)</div>
+          </div>
+        </div>
+        <div class="modal-footer border-secondary">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">關閉</button>
+        </div>
+      </div>
+    </div>
   </div>
-</footer>
 
  </body>
 </html>
