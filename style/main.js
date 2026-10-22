@@ -26,13 +26,13 @@ const chart1_options = {
         backgroundColor: 'transparent',
         spacing: [15, 10, 15, 10],
         style: {
-            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+            fontFamily: '"Source Han Sans TC", "Noto Sans CJK TC", "Noto Sans TC", BiauKai, "DFKai-SB", serif'
         }
     },
     plotOptions: {
         candlestick: {
-            color: '#27ae60',       // 跌 (綠)
-            upColor: '#eb5757',     // 漲 (紅)
+            color: '#27ae60',       // Falling price (green)
+            upColor: '#eb5757',     // Rising price (red)
             lineColor: '#27ae60',
             upLineColor: '#eb5757',
             maker: {
@@ -46,27 +46,28 @@ const chart1_options = {
         }
     },
     rangeSelector: {
+        enabled: false,
         selected: 2,
         inputEnabled: false,
         buttons: [{
             type: 'month',
             count: 1,
-            text: '1月'
+            text: '1M'
         }, {
             type: 'month',
             count: 3,
-            text: '3月'
+            text: '3M'
         }, {
             type: 'month',
             count: 6,
-            text: '6月'
+            text: '6M'
         }, {
             type: 'year',
             count: 1,
-            text: '1年'
+            text: '1Y'
         }, {
             type: 'all',
-            text: '全部'
+            text: 'ALL'
         }],
         buttonTheme: {
             fill: 'rgba(255, 255, 255, 0.05)',
@@ -165,7 +166,7 @@ const chart1_options = {
             style: { color: '#848e9c', fontSize: '11px' }
         },
         title: {
-            text: '外資期貨淨留倉 (口)',
+            text: '外資淨部位 (口)',
             style: { color: '#848e9c' }
         },
         top: '76%',
@@ -224,7 +225,7 @@ const chart2_options = {
         backgroundColor: 'transparent',
         spacing: [15, 10, 15, 10],
         style: {
-            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+            fontFamily: '"Source Han Sans TC", "Noto Sans CJK TC", "Noto Sans TC", BiauKai, "DFKai-SB", serif'
         }
     },
     plotOptions: {
@@ -233,27 +234,28 @@ const chart2_options = {
         }
     },
     rangeSelector: {
+        enabled: false,
         selected: 2,
         inputEnabled: false,
         buttons: [{
             type: 'month',
             count: 1,
-            text: '1月'
+            text: '1M'
         }, {
             type: 'month',
             count: 3,
-            text: '3月'
+            text: '3M'
         }, {
             type: 'month',
             count: 6,
-            text: '6月'
+            text: '6M'
         }, {
             type: 'year',
             count: 1,
-            text: '1年'
+            text: '1Y'
         }, {
             type: 'all',
-            text: '全部'
+            text: 'ALL'
         }],
         buttonTheme: {
             fill: 'rgba(255, 255, 255, 0.05)',
@@ -296,7 +298,7 @@ const chart2_options = {
             style: { color: '#848e9c', fontSize: '11px' }
         },
         title: {
-            text: '小台未平倉口數 (Lots)',
+            text: '小台淨部位 (口)',
             style: { color: '#848e9c' }
         },
         height: '100%',
@@ -365,42 +367,47 @@ const chart2_options = {
 function extractKPISummary(futTxData, chipData, mtxData) {
     if (!futTxData || futTxData.length < 2) return null;
 
-    const latestTx = futTxData[futTxData.length - 1];
-    const prevTx = futTxData[futTxData.length - 2];
-    const txDate = new Date(latestTx[0]);
-    const dateStr = `${txDate.getFullYear()}/${String(txDate.getMonth() + 1).padStart(2, '0')}/${String(txDate.getDate()).padStart(2, '0')}`;
-
-    const closePrice = latestTx[4];
-    const prevClose = prevTx[4];
-    const priceChange = closePrice - prevClose;
-    const priceChangePct = ((priceChange / prevClose) * 100).toFixed(2);
-    const volume = latestTx[5];
-
-    let foreignTxLots = 0;
-    let foreignTxLotsChange = 0;
-    let spotAmountYi = 0;
-    if (chipData && chipData.length >= 2) {
-        const latestChip = chipData[chipData.length - 1];
-        const prevChip = chipData[chipData.length - 2];
-        foreignTxLots = parseFloat(latestChip[4]);
-        foreignTxLotsChange = foreignTxLots - parseFloat(prevChip[4]);
-        spotAmountYi = (parseFloat(latestChip[2]) / 10).toFixed(2); // 原始為 0.1 億，除以 10 為億元
-    }
-
-    let mtxDealer = 0;
-    let mtxIt = 0;
-    let mtxForeign = 0;
-    let mtxTotal = 0;
-    if (mtxData && mtxData.length >= 1) {
-        const latestMtx = mtxData[mtxData.length - 1];
-        mtxDealer = Math.round(parseFloat(latestMtx[1]));
-        mtxIt = Math.round(parseFloat(latestMtx[2]));
-        mtxForeign = Math.round(parseFloat(latestMtx[3]));
-        mtxTotal = mtxDealer + mtxIt + mtxForeign;
-    }
+    // Sort and deduplicate dates before taking daily observations.
+    const normalize = rows => [...new Map(rows.map(row => [Number(row[0]), row])).values()]
+        .sort((a, b) => a[0] - b[0]);
+    futTxData = normalize(futTxData);
+    chipData = normalize(chipData || []);
+    mtxData = normalize(mtxData || []);
+    const chipDates = new Set(chipData.map(row => Number(row[0])));
+    const latestTx = [...futTxData].reverse().find(row => chipDates.has(Number(row[0])));
+    if (!latestTx) throw new Error('價格與外資資料沒有共同交易日');
+    const timestamp = Number(latestTx[0]);
+    const txIndex = futTxData.indexOf(latestTx);
+    const prevTx = futTxData[txIndex - 1];
+    const chipIndex = chipData.findIndex(row => Number(row[0]) === timestamp);
+    const latestChip = chipData[chipIndex];
+    // Match the previous TX trading date; never compare mismatched dates.
+    const prevChip = prevTx && chipData.find(row => Number(row[0]) === Number(prevTx[0]));
+    const dateStr = new Date(timestamp).toISOString().slice(0, 10).replaceAll('-', '/');
+    const closePrice = Number(latestTx[4]);
+    const priceChange = prevTx ? closePrice - Number(prevTx[4]) : null;
+    const priceChangePct = prevTx && Number(prevTx[4]) !== 0 ? priceChange / Number(prevTx[4]) * 100 : null;
+    const volume = Number(latestTx[5]);
+    const volumeChange = prevTx ? volume - Number(prevTx[5]) : null;
+    const volumeChangePct = prevTx && Number(prevTx[5]) > 0 ? volumeChange / Number(prevTx[5]) * 100 : null;
+    const foreignTxLots = Number(latestChip[4]);
+    const foreignTxLotsChange = prevChip ? foreignTxLots - Number(prevChip[4]) : null;
+    // Backend amounts are already expressed in 100 million TWD.
+    const spotAmountYi = Number(latestChip[2]).toFixed(2);
+    const spotAmountChangeYi = prevChip ? Number(latestChip[2]) - Number(prevChip[2]) : null;
+    const volumes = futTxData.slice(Math.max(0, txIndex - 20), txIndex).map(row => Number(row[5]));
+    const averageVolume = volumes.reduce((sum, value) => sum + value, 0) / 20;
+    const volumeRatio = volumes.length === 20 && volumes.every(value => Number.isFinite(value) && value >= 0)
+        && averageVolume > 0 && Number.isFinite(volume) ? volume / averageVolume : null;
+    const latestMtx = mtxData.find(row => Number(row[0]) === timestamp);
+    const mtxDealer = latestMtx ? Math.round(Number(latestMtx[1])) : null;
+    const mtxIt = latestMtx ? Math.round(Number(latestMtx[2])) : null;
+    const mtxForeign = latestMtx ? Math.round(Number(latestMtx[3])) : null;
+    const mtxTotal = latestMtx ? mtxDealer + mtxIt + mtxForeign : null;
 
     return {
         dateStr,
+        volumeRatio, volumeChange, volumeChangePct,
         closePrice,
         priceChange,
         priceChangePct,
@@ -408,6 +415,7 @@ function extractKPISummary(futTxData, chipData, mtxData) {
         foreignTxLots,
         foreignTxLotsChange,
         spotAmountYi,
+        spotAmountChangeYi,
         mtxDealer,
         mtxIt,
         mtxForeign,
@@ -428,13 +436,13 @@ function renderKPICards(kpi) {
     // Card 1: TX Price
     const txPriceEl = document.getElementById('kpi_tx_price');
     const txChangeEl = document.getElementById('kpi_tx_change');
-    if (txPriceEl && txChangeEl) {
+    if (txPriceEl && txChangeEl && kpi.priceChange !== null && kpi.priceChangePct !== null) {
         txPriceEl.textContent = kpi.closePrice.toLocaleString();
         const sign = kpi.priceChange > 0 ? '+' : '';
         const colorClass = kpi.priceChange > 0 ? 'val-up' : (kpi.priceChange < 0 ? 'val-down' : 'val-neutral');
         const arrow = kpi.priceChange > 0 ? '▲' : (kpi.priceChange < 0 ? '▼' : '─');
         txChangeEl.className = `kpi-sub ${colorClass}`;
-        txChangeEl.innerHTML = `<span>${arrow} ${sign}${kpi.priceChange} (${sign}${kpi.priceChangePct}%)</span>`;
+        txChangeEl.innerHTML = `<span>${arrow} ${sign}${kpi.priceChange.toLocaleString()} (${sign}${kpi.priceChangePct.toFixed(2)}%)</span>`;
     }
 
     // Card 2: Foreign TX Lots
@@ -450,24 +458,32 @@ function renderKPICards(kpi) {
         foreignLotsChangeEl.textContent = `較前日 ${changeSign}${Math.round(kpi.foreignTxLotsChange).toLocaleString()} 口`;
     }
 
-    // Card 3: Foreign Spot Net Amount
+    if (kpi.foreignTxLotsChange === null) foreignLotsChangeEl.textContent = '較前日 —';
+    document.getElementById('kpi_volume_ratio').textContent = kpi.volumeRatio === null ? '—' : `${kpi.volumeRatio.toFixed(2)}×`;
+    const volumeSign = kpi.volumeChange > 0 ? '+' : '';
+    document.getElementById('kpi_vol_change').textContent = kpi.volumeChange === null ? '較前日 —'
+        : `較前日 ${volumeSign}${kpi.volumeChange.toLocaleString()} 口${kpi.volumeChangePct === null ? '' : ` (${volumeSign}${kpi.volumeChangePct.toFixed(2)}%)`}`;
+
+    // Secondary foreign spot summary
     const spotEl = document.getElementById('kpi_spot_amount');
     const spotSubEl = document.getElementById('kpi_spot_sub');
     if (spotEl && spotSubEl) {
         const spotColor = kpi.spotAmountYi > 0 ? 'val-up' : (kpi.spotAmountYi < 0 ? 'val-down' : 'val-neutral');
         const spotSign = kpi.spotAmountYi > 0 ? '+' : '';
-        spotEl.className = `kpi-value ${spotColor}`;
+        spotEl.className = spotColor;
         spotEl.textContent = `${spotSign}${kpi.spotAmountYi} 億`;
-        spotSubEl.textContent = kpi.spotAmountYi > 0 ? '偏多買超' : (kpi.spotAmountYi < 0 ? '偏空賣超' : '平盤');
+        const change = kpi.spotAmountChangeYi;
+        spotSubEl.textContent = change === null ? '較前日 —' : `較前日 ${change > 0 ? '+' : ''}${change.toFixed(2)} 億`;
+        spotSubEl.className = change > 0 ? 'val-up' : (change < 0 ? 'val-down' : 'val-neutral');
     }
 
     // Card 4: MTX Major Entities Net
     const mtxEl = document.getElementById('kpi_mtx_total');
     const mtxDetailEl = document.getElementById('kpi_mtx_detail');
-    if (mtxEl && mtxDetailEl) {
+    if (mtxEl && mtxDetailEl && kpi.mtxTotal !== null) {
         const mtxColor = kpi.mtxTotal > 0 ? 'val-up' : (kpi.mtxTotal < 0 ? 'val-down' : 'val-neutral');
         const mtxSign = kpi.mtxTotal > 0 ? '+' : '';
-        mtxEl.className = `kpi-value ${mtxColor}`;
+        mtxEl.className = mtxColor;
         mtxEl.textContent = `${mtxSign}${kpi.mtxTotal.toLocaleString()} 口`;
         mtxDetailEl.textContent = `外資 ${kpi.mtxForeign > 0 ? '+' : ''}${kpi.mtxForeign} / 投信 ${kpi.mtxIt > 0 ? '+' : ''}${kpi.mtxIt}`;
     }
@@ -479,8 +495,121 @@ function renderKPICards(kpi) {
     }
 }
 
+// Load composition independently so unavailable detail never blocks the dashboard.
+async function loadForeignPositions(dateStr) {
+    try {
+        const response = await fetch('web_json/foreign_positions.json', { cache: 'no-cache' });
+        if (!response.ok) throw new Error('Position detail unavailable');
+        const data = await response.json();
+        renderForeignPositions(data.dates?.[dateStr.replaceAll('/', '-')]);
+    } catch (error) {
+        renderForeignPositions(null);
+        console.warn('Position detail:', error);
+    }
+}
+
+function positionBuyShare(position) {
+    if (!position || !Number.isFinite(position.buy) || !Number.isFinite(position.sell)
+        || position.buy < 0 || position.sell < 0 || position.buy + position.sell === 0) return null;
+    return 100 * position.buy / (position.buy + position.sell);
+}
+
+function renderForeignPositions(positions) {
+    let available = 0;
+    document.querySelectorAll('.position-row').forEach(row => {
+        const product = row.dataset.product;
+        const position = positions?.[product];
+        const share = positionBuyShare(position);
+        const track = row.querySelector('.position-track');
+        const marker = track.querySelector('span');
+        const valid = position && Number.isFinite(position.buy) && Number.isFinite(position.sell)
+            && position.buy >= 0 && position.sell >= 0;
+        row.querySelector('.position-buy').textContent = valid ? `${position.buy.toLocaleString()}${share === null ? '' : ` · ${share.toFixed(1)}%`}` : '—';
+        row.querySelector('.position-sell').textContent = valid ? `${position.sell.toLocaleString()}${share === null ? '' : ` · ${(100 - share).toFixed(1)}%`}` : '—';
+        marker.hidden = share === null;
+        track.classList.toggle('position-unavailable', share === null);
+        if (share !== null) {
+            marker.style.left = `${share}%`;
+            track.style.setProperty('--buy-share', `${share}%`);
+            available++;
+        }
+        track.setAttribute('aria-label', share === null ? `${product} 無可比較部位`
+            : `${product} 買方 ${position.buy.toLocaleString()} 口，占 ${share.toFixed(1)}%；賣方 ${position.sell.toLocaleString()} 口，占 ${(100 - share).toFixed(1)}%`);
+    });
+    document.getElementById('position_status').textContent = available === 3 ? '' : '部分同日部位資料未提供或無可比較部位';
+}
+
+// Each page load gets one countdown; user interaction cancels it for that load.
+let summaryDisclosure = null;
+function setupSummaryDisclosure() {
+    const summary = document.getElementById('market_summary');
+    const button = document.getElementById('summary_toggle');
+    const details = [...summary.querySelectorAll('.summary-detail')];
+    let timer = null;
+    let cancelled = false;
+    let started = false;
+    let expanded = true;
+    const cancel = () => {
+        cancelled = true;
+        if (timer !== null) clearTimeout(timer);
+        timer = null;
+    };
+    const setExpanded = value => {
+        expanded = value;
+        summary.classList.toggle('is-collapsed', !value);
+        details.forEach(detail => {
+            detail.inert = !value;
+            detail.setAttribute('aria-hidden', String(!value));
+        });
+        button.setAttribute('aria-expanded', String(value));
+        const label = value ? '收合明細' : '展開明細';
+        button.setAttribute('aria-label', label);
+        button.setAttribute('title', label);
+    };
+    button.addEventListener('click', () => { cancel(); setExpanded(!expanded); });
+    // Keep embedded disclosures and text selection independent of card toggling.
+    summary.addEventListener('click', event => {
+        if (!event.target.closest('.kpi-card') || event.target.closest('details, button, a, input, select, textarea')) return;
+        if (window.getSelection?.().toString()) return;
+        cancel();
+        setExpanded(!expanded);
+    });
+    summary.querySelectorAll('.kpi-card').forEach(card => {
+        card.tabIndex = 0;
+        card.addEventListener('keydown', event => {
+            if (event.target !== card || !['Enter', ' '].includes(event.key)) return;
+            event.preventDefault();
+            cancel();
+            setExpanded(!expanded);
+        });
+    });
+    summary.addEventListener('pointerdown', cancel, { passive: true });
+    summary.addEventListener('pointerenter', cancel, { passive: true });
+    summary.addEventListener('focusin', cancel);
+    const cancelAtChart = () => {
+        const chart = document.getElementById('container_stock');
+        if (window.scrollY > 0 && chart.getBoundingClientRect().top < window.innerHeight) cancel();
+    };
+    window.addEventListener('scroll', cancelAtChart, { passive: true });
+    document.addEventListener('visibilitychange', () => { if (document.hidden) cancel(); });
+    return {
+        start() {
+            if (started || cancelled) return;
+            started = true;
+            cancelAtChart();
+            if (cancelled || document.hidden || summary.contains(document.activeElement) || summary.matches(':hover')) return;
+            timer = setTimeout(() => {
+                timer = null;
+                cancelAtChart();
+                if (!cancelled && !summary.contains(document.activeElement) && !summary.matches(':hover')) setExpanded(false);
+            }, 3000);
+        }
+    };
+}
+
 // Main Data Fetcher
 document.addEventListener('DOMContentLoaded', function() {
+    summaryDisclosure = setupSummaryDisclosure();
     loadDashboardData();
 });
 
@@ -511,6 +640,9 @@ function loadDashboardData() {
         chipData = rawData;
         mtxData = rawMtx;
 
+        // Reset series so a reload does not duplicate observations.
+        [...chart1_options.series, ...chart2_options.series].forEach(series => { series.data = []; });
+
         // Populate Chart 1
         for (let i = 0; i < futTxData.length; i++) {
             chart1_options.series[0].data.push([
@@ -522,10 +654,10 @@ function loadDashboardData() {
             ]);
         }
         for (let i = 0; i < chipData.length; i++) {
-            // Note: convert 0.1 億 to 億 (除以 10) for easier reading
-            chart1_options.series[1].data.push([chipData[i][0], parseFloat((parseFloat(chipData[i][1]) / 10).toFixed(2))]);
-            chart1_options.series[2].data.push([chipData[i][0], parseFloat((parseFloat(chipData[i][2]) / 10).toFixed(2))]);
-            chart1_options.series[3].data.push([chipData[i][0], parseFloat((parseFloat(chipData[i][3]) / 10).toFixed(2))]);
+            // Preserve backend amounts in 100 million TWD without rescaling.
+            chart1_options.series[1].data.push([chipData[i][0], parseFloat(chipData[i][1])]);
+            chart1_options.series[2].data.push([chipData[i][0], parseFloat(chipData[i][2])]);
+            chart1_options.series[3].data.push([chipData[i][0], parseFloat(chipData[i][3])]);
             chart1_options.series[4].data.push([chipData[i][0], parseFloat(chipData[i][4])]);
         }
 
@@ -540,6 +672,7 @@ function loadDashboardData() {
         // Render KPI Header
         const kpi = extractKPISummary(futTxData, chipData, mtxData);
         renderKPICards(kpi);
+        const positionReady = kpi ? loadForeignPositions(kpi.dateStr) : Promise.resolve();
 
         // Hide Skeletons
         const stockSkeleton = document.getElementById('stock_skeleton');
@@ -551,9 +684,17 @@ function loadDashboardData() {
         stockChartInstance = Highcharts.stockChart('container_stock', chart1_options);
         mtxChartInstance = Highcharts.stockChart('container_MTX', chart2_options);
 
+        [stockChartInstance, mtxChartInstance].forEach(chart => {
+            const end = chart.xAxis[0].dataMax;
+            const start = new Date(end);
+            start.setUTCMonth(start.getUTCMonth() - 6);
+            chart.xAxis[0].setExtremes(start.getTime(), end);
+        });
+
         // Setup custom range buttons
         setupRangeButtons('stock_range_btns', stockChartInstance);
         setupRangeButtons('mtx_range_btns', mtxChartInstance);
+        positionReady.then(() => summaryDisclosure?.start());
     })
     .catch(err => {
         console.error('Data load error:', err);
@@ -590,8 +731,9 @@ function setupRangeButtons(containerId, chartInstance) {
             // ALL
             xAxis.setExtremes(xAxis.dataMin, max);
         } else {
-            const min = max - (months * 30 * 24 * 3600 * 1000);
-            xAxis.setExtremes(min, max);
+            const start = new Date(max);
+            start.setUTCMonth(start.getUTCMonth() - months);
+            xAxis.setExtremes(start.getTime(), max);
         }
     });
 }

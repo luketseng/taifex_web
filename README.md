@@ -70,3 +70,27 @@ taifex_web/
 
 [MIT](LICENSE)  
 For questions or suggestions, please submit an Issue or Pull Request!
+
+## Foreign position detail preview
+
+The three position tracks read `web_json/foreign_positions.json`, matched to the
+summary trading date. Data processing and export tools belong to `taifex_daily`.
+For a manual export, run from the backend repository:
+
+```bash
+cd ~/git/taifex_daily
+python3 -m lib.foreign_positions ./II_DB.db --date 2026/10/16 --output ../taifex_web/web_json/foreign_positions.json
+```
+
+The exporter opens SQLite read-only and lives in `taifex_daily/lib/foreign_positions.py`.
+The daily `get_data.py` pipeline now exports the requested day after updating data,
+using its working directory (the existing cron runs in `web_json/`). Existing
+dates are preserved and repeat runs replace only the target date. Incomplete days
+leave the file unchanged. Publication uses an atomic file replacement. Missing dates
+show unavailable detail without blocking charts. Each track independently compares
+buy-side and sell-side open interest; the blue buy segment and amber sell segment meet at the marker.
+TXO CALL/PUT positions are kept separate from the headline TX net position.
+
+Frontend regression checks stay in this repository (`node tests/metrics.cjs` and
+`node tests/summary-disclosure.cjs`). Database and JSON export regression tests
+belong to `taifex_daily/tests/`; see that repository's README for cron and test commands.

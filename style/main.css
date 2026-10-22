@@ -6,31 +6,29 @@
   --border-color: rgba(255, 255, 255, 0.08);
   --text-primary: #e0e3eb;
   --text-secondary: #848e9c;
-  --text-muted: #5e6673;
+  --text-muted: #9aa4b2;
   --color-up: #eb5757;
   --color-down: #27ae60;
   --color-accent: #2962ff;
   --color-accent-light: rgba(41, 98, 255, 0.15);
   --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.25);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
 }
 
 html, body {
   min-height: 100%;
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: "Source Han Sans TC", "Noto Sans CJK TC", "Noto Sans TC", "BiauKai", "DFKai-SB", serif;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Glassmorphism Navbar */
+/* Flat navigation */
 .navbar-custom {
-  background-color: rgba(24, 27, 36, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background-color: var(--bg-primary);
   border-bottom: 1px solid var(--border-color);
   position: sticky;
   top: 0;
@@ -72,8 +70,8 @@ main.dashboard-container {
 /* KPI Summary Cards Grid */
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
   margin-bottom: 1.5rem;
 }
 
@@ -82,14 +80,14 @@ main.dashboard-container {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   padding: 16px 18px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
   transition: transform 0.2s ease, border-color 0.2s ease;
   position: relative;
   overflow: hidden;
 }
 
 .kpi-card:hover {
-  transform: translateY(-2px);
+  transform: none;
   border-color: rgba(255, 255, 255, 0.16);
 }
 
@@ -147,7 +145,7 @@ main.dashboard-container {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  box-shadow: none;
   margin-bottom: 1.5rem;
   overflow: hidden;
 }
@@ -333,4 +331,111 @@ footer.footer-custom {
   .kpi-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Quiet typography and secondary analytics */
+.dashboard-container > .container-fluid { max-width: 1600px; margin: auto; }
+.kpi-card { padding: 24px; border-width: 0 0 0 1px; border-radius: 0; background: transparent; overflow: visible; }
+.kpi-card:first-child { border-left: 0; }
+.kpi-grid { border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
+.kpi-title { font-size: .85rem; letter-spacing: 0; font-weight: 500; }
+.kpi-value { font-size: clamp(1.5rem, 2.4vw, 2.15rem); font-weight: 600; margin: 10px 0; }
+.kpi-sub { min-height: 1.5em; }
+.metric-info { margin-top: 18px; color: #aab3c2; font-size: .8rem; font-variant-numeric: tabular-nums; }
+.metric-info summary { cursor: pointer; list-style: none; display: flex; gap: 10px; align-items: center; width: fit-content; }
+.metric-info summary::-webkit-details-marker { display: none; }
+.metric-info strong { color: var(--text-primary); font-weight: 500; }
+.metric-info p { max-width: 34em; line-height: 1.8; margin: 12px 0 0; }
+.info-mark { color: var(--text-secondary); }
+.percentile-track { height: 2px; background: #495261; position: relative; margin: 14px 4px 2px; }
+.percentile-track span { position: absolute; top: -3px; width: 8px; height: 8px; border-radius: 50%; background: #d7dee7; transform: translateX(-50%); }
+.chart-title-area h5 { font-weight: 500; font-size: .95rem; margin-bottom: 6px; }
+.chart-title-area .kpi-value { font-size: inherit; font-weight: 500; }
+.range-btn { background: transparent; border-color: transparent; }
+.range-btn.active { background: #343e4d; border-color: #596575; }
+.secondary-summary { font-variant-numeric: tabular-nums; }
+.footer-custom p { font-size: .75rem; }
+:focus-visible { outline: 2px solid #aab8ce; outline-offset: 4px; }
+@media (max-width: 768px) {
+  .kpi-grid { grid-template-columns: 1fr; }
+  .kpi-card { border-left: 0; border-bottom: 1px solid var(--border-color); padding: 20px 8px; }
+  .kpi-card:last-child { border-bottom: 0; }
+  .kpi-value { font-size: 1.7rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* Colored buy/sell segments share a marker at the percentage boundary. */
+.position-structure { margin-top: 18px; padding-bottom: 10px; }
+.position-structure .metric-info { margin-top: 0; }
+.position-head, .position-labels { display: flex; justify-content: space-between; align-items: baseline; }
+.position-head { color: var(--text-secondary); font-size: .7rem; margin: 12px 0 8px; }
+.position-row { margin-top: 12px; }
+.position-labels { font-size: .75rem; font-variant-numeric: tabular-nums; }
+.position-buy, .position-sell { flex: 1; color: #c4cdd9; }
+.position-sell { text-align: right; }
+.position-name { color: var(--text-secondary); font-size: .68rem; margin: 0 8px; }
+.position-track {
+  --buy-share: 50%;
+  height: 6px;
+  border-radius: 3px;
+  margin: 10px 5px 0;
+  background: linear-gradient(to right, #73a9d8 0%, #73a9d8 var(--buy-share), #d3a565 var(--buy-share), #d3a565 100%);
+}
+.position-track span { top: -3px; width: 12px; height: 12px; background: #e8edf4; border: 2px solid var(--bg-primary); box-shadow: 0 0 0 1px #a6b1c0; }
+.position-track.position-unavailable { background: #495261; }
+.buy-key, .position-buy { color: #8cbce5; }
+.sell-key, .position-sell { color: #dfb681; }
+.buy-key::before, .sell-key::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-right: 6px; border-radius: 50%; background: currentColor; }
+.position-track::before { content: ''; position: absolute; left: 50%; top: -3px; width: 1px; height: 12px; background: #c2cad5; opacity: .6; }
+.position-status { color: var(--text-secondary); font-size: .7rem; margin: 10px 0 0; }
+.position-status:empty { display: none; }
+
+/* Shared disclosure keeps all cards aligned while details slide out of view. */
+.kpi-card { cursor: pointer; }
+.kpi-heading { display: flex; align-items: center; justify-content: space-between; position: relative; }
+.kpi-heading .kpi-title { margin-bottom: 6px; padding-right: 32px; }
+#summary_toggle {
+  position: absolute;
+  top: -5px;
+  right: -4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid #495057;
+  border-radius: .375rem;
+  background: #212529;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+#summary_toggle:hover { color: var(--text-primary); border-color: #7b8796; }
+#summary_toggle svg { width: 15px; height: 15px; transition: transform .38s cubic-bezier(.22, 1, .36, 1); }
+#summary_toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+.summary-detail {
+  display: grid;
+  grid-template-rows: 1fr;
+  opacity: 1;
+  overflow: hidden;
+  transition: grid-template-rows .42s cubic-bezier(.22, 1, .36, 1), opacity .28s ease;
+}
+.summary-detail-inner {
+  min-height: 0;
+  overflow: hidden;
+  padding: 0 2px;
+  transform: translateY(0);
+  transition: transform .42s cubic-bezier(.22, 1, .36, 1);
+}
+.kpi-grid.is-collapsed .summary-detail { grid-template-rows: 0fr; opacity: 0; }
+.kpi-grid.is-collapsed .summary-detail-inner { transform: translateY(-12px); }
+#kpi_spot_sub { display: inline-block; margin-left: 12px; }
+@media (pointer: coarse) {
+  /* The card itself remains the large tap target around the compact icon. */
+  #summary_toggle::before { content: ''; position: absolute; inset: -8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .summary-detail, .summary-detail-inner, #summary_toggle svg { transition: none; }
 }
